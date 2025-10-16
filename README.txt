@@ -1,8 +1,8 @@
 
-GCL PWA – Quick Publish Guide (GitHub Pages)
+Quick Publish Guide (GitHub Pages)
 ===========================================
 
-1) Create a new GitHub repository (public), e.g. "gcl-pwa".
+1) Create a new GitHub repository (public), e.g. "pwa".
 2) Upload ALL files and folders from this package into the root of the repo:
    - index.html
    - forms.html
@@ -17,7 +17,7 @@ GCL PWA – Quick Publish Guide (GitHub Pages)
    - Open the repo → Settings → Pages
    - Source: Branch = main, Folder = /(root)
    - Save. Wait up to a minute.
-   - Your site will appear at: https://<your-username>.github.io/gcl-pwa/
+   - Your site will appear at: https://<your-username>.github.io/pwa/
 
 4) Test & Install:
    - Open the site on Chrome/Edge (desktop or Android) → Install app / Add to Home Screen
