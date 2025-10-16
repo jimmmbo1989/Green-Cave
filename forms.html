@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GCL – Forms</title>
+  <meta name="theme-color" content="#0f172a">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    :root{--ink:#0f172a;--muted:#475569;--bg:#0b1220}
+    html,body{height:100%}
+    body{margin:0;background:#0b1220;color:#e2e8f0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;display:flex;flex-direction:column}
+    header{display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.08)}
+    header img{width:28px;height:28px;border-radius:6px}
+    header h1{font-size:18px;margin:0}
+    main{padding:16px;max-width:720px;width:100%;margin:0 auto}
+    .tile{background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;text-decoration:none;color:#e2e8f0}
+    .tile:hover{background:rgba(255,255,255,.06)}
+    .tile h2{font-size:16px;margin:0}
+    .tile small{color:#94a3b8}
+    .go{font-weight:700}
+    a.back{color:#93c5fd;text-decoration:none;padding:10px 14px}
+  </style>
+</head>
+<body>
+  <header>
+    <a class="back" href="index.html">◀ Home</a>
+    <img src="icons/icon-192.png" alt="">
+    <h1>Forms</h1>
+  </header>
+  <main>
+    <a class="tile" href="risk-assessment.html">
+      <div>
+        <h2>Risk Assessment</h2>
+        <small>GCL‑RA001 – Site Specific Risk Assessment & Site Register/Diary</small>
+      </div>
+      <div class="go">Open ›</div>
+    </a>
+  </main>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-worker.js').catch(console.error);
+    }
+  </script>
+</body>
+</html>
