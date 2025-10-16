@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Risk_Assessment_Form</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- html2pdf bundle (html2canvas + jsPDF) -->
+  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+  <style>
+    :root{--ink:#111;--muted:#555;--line:#000;--accent:#1a73e8;--bg:#fff}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,sans-serif}
+    .page{width:190mm;min-height:297mm;margin:0 auto;padding:10mm;background:#fff;box-shadow:0 0 0.5mm rgba(0,0,0,.1)}
+    .a4{width:190mm}
+    h1,h2,h3{margin:0}
+    /* Header */
+    .title{display:grid;grid-template-columns:repeat(12, 1fr);gap:2mm;border:1px solid var(--line);padding:6mm 3mm 6mm 6mm;align-items:start}
+    .logo{width:100%;height:100%;min-height:28mm;border:1px dashed #999;display:flex;align-items:center;justify-content:center}
+    .logo img{width:100%;height:100%;object-fit:contain}
+    .head-right{display:flex;flex-direction:column;gap:4mm;align-items:stretch}
+    .header-text{text-align:left}
+    .w-2{grid-column: span 2}
+    .w-3{grid-column: span 3}
+    .w-4{grid-column: span 4}
+    .w-6{grid-column: span 6}
+    .w-8{grid-column: span 8}
+    .w-12{grid-column: span 12}
+    .header-meta{grid-template-columns:repeat(2, minmax(0,1fr));gap:2mm}
+    .header-refs{display:grid;grid-template-columns:1fr;gap:2mm;align-content:start}
+    .meta .cell{border:1px solid var(--line);padding:2mm;font-size:11px;min-height:14mm}
+    .cell label{display:block;font-size:10px;color:var(--muted);margin-bottom:1mm}
+    input[type=text], input[type=date], input[type=number], textarea{width:100%;border:1px solid #666;padding:2mm;font:inherit;font-size:11px}
+    textarea{min-height:22mm;resize:vertical}
+    .section{border:1px solid var(--line);padding:3mm;margin-top:3mm}
+    .section > .heading{font-weight:700;margin-bottom:2mm}
+    .row{display:grid;grid-template-columns: repeat(12, 1fr);gap:2mm}
+    .box{border:1px solid var(--line);padding:2mm;font-size:11px;min-height:14mm}
+    .box label{display:block;font-size:10px;color:var(--muted);margin-bottom:1mm}
+    .checkline{display:flex;flex-wrap:wrap;gap:6mm}
+    .checkline label{display:inline-flex;align-items:center;gap:3mm;font-size:11px}
+    .small{font-size:10px;color:#333}
+    .table{width:100%;border-collapse:collapse;font-size:11px}
+    .table th,.table td{border:1px solid var(--line);padding:2mm;vertical-align:top}
+    .table th{background:#f6f6f6;text-align:left}
+    .center{text-align:center}
+    .muted{color:var(--muted)}
+    .actions{display:flex;gap:6px;justify-content:flex-end;margin:8mm 0}
+    .btn{border:1px solid #333;background:#fafafa;padding:8px 12px;font-weight:600;cursor:pointer}
+    .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .print-field{flex:0 0 auto}
+    .nobox{padding:0}
+    .nobox label{display:block;font-size:10px;color:var(--muted);margin-bottom:1mm}
+    .inline-input{display:inline-flex;align-items:center;gap:3mm}
+    .inline-input input[type="text"]{width:36mm}
+    .cols-2{display:grid;grid-template-columns:1fr 1fr;gap:2mm 8mm}
+    .cols-2 div{padding:1mm 0}
+    .cols-2 label{display:inline-flex;align-items:center;gap:3mm}
+    /* print */
+    .printing{background:#fff !important; color:#000 !important; color-scheme: light}
+    .printing input[type="text"], .printing input[type="number"], .printing textarea, .printing input[type="date"]{background:#fff !important; color:#000 !important; -webkit-text-fill-color:#000 !important; border:1px solid #666 !important; appearance:none; -webkit-appearance:none; background-image:none !important; filter:none !important}
+    .printing ::placeholder{color:transparent !important}
+    .printing .title, .printing .section, .printing .box, .printing .table th, .printing .table td{border-width:1.1px !important; border-color:#000 !important}
+    /* keep long checklines inside their boxes when printing */
+    .printing .checkline{flex-wrap:wrap !important}
+    .printing .inline-input input[type="text"]{width:32mm !important; max-width:100%}
+    @media print{
+      .page{margin:0;box-shadow:none;padding:6mm}
+      .actions{display:none}
+      a[href]::after{content:""}
+      /* page-break helpers (disabled) */ }.row, .box{break-inside:avoid;page-break-inside:avoid}
+    }
+    /* Page-break helpers removed */\n  </style>
+</head>
+<body>
+  <div class="actions">
+    <button class="btn" id="btnClear" type="button">Clear Form</button>
+    <button class="btn" id="btnPDF" type="button">Save as PDF</button>
+    <button class="btn primary" id="btnShare" type="button">Share PDF</button>
+  </div>
+
+  <form id="raForm">
+  <div id="page" class="page">
+    <!-- Header / Logo / Title -->
+    <div class="title">
+      <div class="header-text w-8">
+        <h1 style="font-size:16px">Site Specific Risk Assessment &amp; Site Register/Diary</h1>
+        <div class="small">Must be Completed Before Starting Work &amp; Amended if Site Conditions Change</div>
+      </div>
+      <div class="box w-4"><div class="header-refs">
+        <div class="cell"><label>Reference</label><input type="text" name="reference" value="RA-" /></div>
+        <div class="cell"><label>Date</label><input type="date" name="doc_date" id="doc_date" /></div>
+      </div></div>
+    </div>
+
+    <!-- Main details section -->
+    <div class="section">
+      <div class="row">
+        <div class="box w-6"><label>Name</label><input type="text" name="name" autocomplete="name"/></div>
+        <div class="box w-6"><label>Job Number</label><input type="text" name="job_number"/></div>
+      </div>
+      <div class="row" style="margin-top:2mm">
+        <div class="box w-8"><label>Address</label><textarea name="address"></textarea></div>
+        <div class="box w-4">
+          <div style="display:grid; grid-template-columns:1fr; gap:2mm">
+            <div>
+              <label class="small" style="margin:0;padding:0">Date Start</label>
+              <input type="date" name="date_start" />
+            </div>
+            <div>
+              <label class="small" style="margin:0;padding:0">Date Finish</label>
+              <input type="date" name="date_finish" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:2mm">
+        <div class="box w-12"><label>Description of Works</label><textarea name="description"></textarea></div>
+      </div>
+    </div>
+
+    <!-- Activity / Location / Cable -->
+    <div class="section">
+      <div class="row">
+        <div class="box w-4"><label>Activity</label>
+          <div class="checkline">
+            <label><input type="checkbox" name="activity" value="Cabling"> Cabling</label>
+            <label><input type="checkbox" name="activity" value="Jointing"> Jointing</label>
+          </div>
+        </div>
+        <div class="box w-8"><label>Location</label>
+          <div class="checkline" style="gap:4mm;flex-wrap:nowrap">
+            <label><input type="checkbox" name="location" value="Cust Conn"> Cust Conn</label>
+            <label><input type="checkbox" name="location" value="Int"> Int</label>
+            <label><input type="checkbox" name="location" value="Ext"> Ext</label>
+            <label><input type="checkbox" name="location" value="O/H"> O/H</label>
+            <label><input type="checkbox" name="location" value="U/G"> U/G</label>
+          </div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:2mm">
+        <div class="box w-12">
+          <label>Cable</label>
+          <div class="checkline">
+            <label><input type="checkbox" name="cable" value="Sub Duct"> Sub Duct</label>
+            <label><input type="checkbox" name="cable" value="Blown Fibre"> Blown Fibre</label>
+            <label><input type="checkbox" name="cable" value="Rod & Rope"> Rod &amp; Rope</label>
+            <label><input type="checkbox" name="cable" value="Fibre"> Fibre</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Persons at risk / Weather / Risk Elements -->
+    <div class="section">
+      <div class="row">
+        <div class="box w-12"><label>Persons at Risk?</label>
+          <div class="checkline">
+            <label><input type="checkbox" name="risk_persons" value="Competent Staff"> Competent Staff</label>
+            <label><input type="checkbox" name="risk_persons" value="Client Staff"> Client Staff</label>
+            <label><input type="checkbox" name="risk_persons" value="M.O.P."> M.O.P.</label>
+          </div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:2mm">
+        <div class="box w-12"><label>Weather</label>
+          <div class="checkline" style="flex-wrap:nowrap">
+            <label><input type="checkbox" name="weather" value="Sunny"> Sunny</label>
+            <label><input type="checkbox" name="weather" value="Rain"> Rain</label>
+            <label><input type="checkbox" name="weather" value="Frost"> Frost</label>
+            <label><input type="checkbox" name="weather" value="Snow"> Snow</label>
+            <label><input type="checkbox" name="weather" value="Windy"> Windy</label>
+            <label><input type="checkbox" name="weather" value="Other" aria-label="Other"></label>
+            <span class="inline-input"><input type="text" name="weather_other" placeholder="Other Specify" aria-label="Other Specify"></span>
+          </div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:2mm">
+        <div class="box w-12">
+          <label>Risk Elements (tick as applicable)</label>
+          <div class="checkline">
+            <label><input type="checkbox" name="risk_element" value="Environment"> Environment</label>
+            <label><input type="checkbox" name="risk_element" value="Electrical Equipment"> Electrical Equipment</label>
+            <label><input type="checkbox" name="risk_element" value="Vehicles"> Vehicles</label>
+            <label><input type="checkbox" name="risk_element" value="Manual Handling"> Manual Handling</label>
+            <label><input type="checkbox" name="risk_element" value="Working at Height"> Working at Height</label>
+            <label><input type="checkbox" name="risk_element" value="Excavation"> Excavation</label>
+            <label><input type="checkbox" name="risk_element" value="Mechanical Lifting"> Mechanical Lifting</label>
+            <label><input type="checkbox" name="risk_element" value="Working with Optic Fibre"> Working with Optic Fibre</label>
+            <label><input type="checkbox" name="risk_element" value="Hot Works"> Hot Works</label>
+            <label><input type="checkbox" name="risk_element" value="Hand Tools"> Hand Tools</label>
+            <label><input type="checkbox" name="risk_element" value="Confined Space Working"> Confined Space Working</label>
+            <label><input type="checkbox" name="risk_element" value="COSHH"> COSHH</label>
+          </div>
+        </div>
+      </div>
+    </div>
+<div class="section no-split"><div class="row"><div class="box w-12"><label>Comments &amp; Instruction</label><textarea name="comments"></textarea></div>
+      </div>
+    </div>
+
+    <!-- Risk Matrix legend (static) -->
+    <div class="section">
+      <div class="heading">Risk Matrix Guidance</div>
+      <div class="row" style="margin-top:2mm">
+        <div class="box w-6">
+          <strong>Likelihood of Harm (L)</strong>
+          <div class="small" style="margin-top:1mm">3 – Very likely to occur<br>2 – May occur<br>1 – Unlikely to occur</div>
+        </div>
+        <div class="box w-6">
+          <strong>Severity of Harm (S)</strong>
+          <div class="small" style="margin-top:1mm">3 – High (Fatal, loss of limb, sight etc.)<br>2 – Med (Broken bones, deep cuts etc.)<br>1 – Low (Small cuts, grazes etc.)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Task Risk Assessment rows -->
+    <div class="section">
+      <div class="heading">Task Risk Controls &amp; Residual Risk Ratings</div>
+      <table class="table" id="riskTable" style="margin-top:2mm">
+        <thead>
+          <tr>
+            <th>Risk Element</th>
+            <th>Task Risk Assessment Nos.</th>
+            <th>Site Specific Action Taken / Controls Required (additional to task assessment)</th>
+            <th class="center" style="width:16mm">L</th>
+            <th class="center" style="width:16mm">S</th>
+            <th class="center" style="width:18mm">RRR</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Location</td>
+            <td><input type="text" name="tra_location"></td>
+            <td><textarea name="ctrl_location"></textarea></td>
+            <td class="center"><input type="number" name="L_location" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="S_location" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="RRR_location" readonly></td>
+          </tr>
+          <tr>
+            <td>Handling / Lifting</td>
+            <td><input type="text" name="tra_handling"></td>
+            <td><textarea name="ctrl_handling"></textarea></td>
+            <td class="center"><input type="number" name="L_handling" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="S_handling" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="RRR_handling" readonly></td>
+          </tr>
+          <tr>
+            <td>Tools</td>
+            <td><input type="text" name="tra_tools"></td>
+            <td><textarea name="ctrl_tools"></textarea></td>
+            <td class="center"><input type="number" name="L_tools" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="S_tools" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="RRR_tools" readonly></td>
+          </tr>
+          <tr>
+            <td>Working at Height</td>
+            <td><input type="text" name="tra_height"></td>
+            <td><textarea name="ctrl_height"></textarea></td>
+            <td class="center"><input type="number" name="L_height" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="S_height" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="RRR_height" readonly></td>
+          </tr>
+          <tr>
+            <td>Working U/G</td>
+            <td><input type="text" name="tra_ug"></td>
+            <td><textarea name="ctrl_ug"></textarea></td>
+            <td class="center"><input type="number" name="L_ug" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="S_ug" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="RRR_ug" readonly></td>
+          </tr>
+          <tr>
+            <td>Electrical Equipment</td>
+            <td><input type="text" name="tra_elec"></td>
+            <td><textarea name="ctrl_elec"></textarea></td>
+            <td class="center"><input type="number" name="L_elec" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="S_elec" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="RRR_elec" readonly></td>
+          </tr>
+          <tr>
+            <td>Work Equipment</td>
+            <td><input type="text" name="tra_we"></td>
+            <td><textarea name="ctrl_we"></textarea></td>
+            <td class="center"><input type="number" name="L_we" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="S_we" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="RRR_we" readonly></td>
+          </tr>
+          <tr>
+            <td>Environmental</td>
+            <td><input type="text" name="tra_env"></td>
+            <td><textarea name="ctrl_env"></textarea></td>
+            <td class="center"><input type="number" name="L_env" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="S_env" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="RRR_env" readonly></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- COSHH / Subbie RAs -->
+    <div class="section">
+      <div class="heading">COSHH / Other / Sub Contractor Risk Assessments</div>
+      <textarea name="coshh" style="width:100%;min-height:24mm"></textarea>
+      <div class="checkline" style="margin-top:2mm">
+        <span>All tools and equipment checked prior to use and fit for use?</span>
+        <label><input type="radio" name="tools_checked" value="Y"> Y</label>
+        <label><input type="radio" name="tools_checked" value="N"> N</label>
+      </div>
+    </div>
+
+    <!-- Briefed to / site visitors -->
+    <div class="section">
+      <div class="heading">Briefed to / site visitors: Name / Date</div>
+      <table class="table" id="visTable" style="margin-top:2mm">
+        <thead><tr><th style="width:55%">Name</th><th style="width:35%">Date</th><th class="center" style="width:10%">Action</th></tr></thead>
+        <tbody>
+          <tr><td><input type="text" name="vis_name_1"></td><td><input type="date" name="vis_date_1"></td><td class="center"><button type="button" class="btn" onclick="removeRow(this)">Remove</button></td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:3mm"><button type="button" class="btn" onclick="addVisitor()">Add Row</button></div>
+    </div>
+
+    <!-- Residual Risk Ratings guidance -->
+    <div class="section">
+      <div class="heading">Residual Risk Ratings (RRR)</div>
+      <div class="small" style="margin-top:1mm">
+        <strong>High:</strong> STOP WORK – Contact manager / supervisor<br>
+        <strong>Med:</strong> Apply additional controls to reduce to low. If still Med. contact manager / supervisor for advice<br>
+        <strong>Low:</strong> Carry out work as per knowledge, skills, training and experience
+      </div>
+    </div>
+
+    <!-- Risk Assessment sheet numbers -->
+    <div class="section">
+      <div class="heading">Risk Assessment Sheet Numbers</div>
+      <div class="row" style="margin-top:2mm">
+        <div class="box w-12">
+          <div class="cols-2">
+            <label><input type="checkbox" name="ra_sheet" value="RA002"> Manual Handing RA002</label>
+            <label><input type="checkbox" name="ra_sheet" value="RA004"> Use of Ladders &amp; Step ladders RA004</label>
+            <label><input type="checkbox" name="ra_sheet" value="RA016"> U/G cabling &amp; sub-ducting RA016</label>
+            <label><input type="checkbox" name="ra_sheet" value="RA019"> Working with Optical fibre RA019</label>
+            <label><input type="checkbox" name="ra_sheet" value="RA024"> Use of hand tools RA024</label>
+            <label><input type="checkbox" name="ra_sheet" value="RA032"> Internal cabling RA032</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="small" style="margin-top:4mm;text-align:center">
+      Once completed brief to all on site and attach the completed form to job work sheet.<br>
+      <em>Note: Person completing this form is the authorised person in charge of the site.</em>
+    </div>
+  </div>
+  </form>
+
+  <script>
+    const BASE_NAME = 'Risk_Assessment_Form';
+    // --- Prefill header date to today (ISO value for date inputs) ---
+    (function(){
+      const el = document.querySelector('input[name="doc_date"]');
+      if(el && !el.value){
+        const d = new Date();
+        d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+        el.value = d.toISOString().slice(0,10); // yyyy-mm-dd for <input type="date">
+      }
+    })();
+
+    // --- Utilities ---
+    function isoToUK(iso){
+      if(!iso) return '';
+      const parts = (iso||'').split('-');
+      if(parts.length!==3) return iso;
+      const [y,m,d] = parts;
+      return `${d}/${m}/${y}`; // dd/mm/yyyy
+    }
+    function dateStampDMY(){
+      const n = new Date();
+      const dd = String(n.getDate()).padStart(2,'0');
+      const mm = String(n.getMonth()+1).padStart(2,'0');
+      const yyyy = n.getFullYear();
+      return `${dd}-${mm}-${yyyy}`; // dd-mm-yyyy for filenames (fallback)
+    }
+    // Additional helpers
+    function isoToUKHyphen(iso){
+      if(!iso) return '';
+      const parts = (iso||'').split('-');
+      if(parts.length!==3) return iso;
+      const y=parts[0], m=parts[1], d=parts[2];
+      return `${d}-${m}-${y}`; // dd-mm-yyyy
+    }
+    function todayISO(){
+      const d = new Date();
+      d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
+      return d.toISOString().slice(0,10);
+    }
+    function sanitizePart(s){
+      if(s == null) return '';
+      s = String(s);
+      // Replace any character not allowed in filenames with '-'
+      s = s.replace(/[^A-Za-z0-9_-]+/g, '-');
+      // Collapse consecutive dashes and trim leading/trailing dashes/underscores
+      s = s.replace(/-+/g,'-').replace(/^[-_]+|[-_]+$/g,'');
+      if(s.length > 60) s = s.slice(0,60);
+      return s;
+    }
+    function buildFileName(){
+      const refEl  = document.querySelector('input[name="reference"]');
+      const jobEl  = document.querySelector('input[name="job_number"]');
+      const dateEl = document.querySelector('input[name="doc_date"]');
+
+      let ref = sanitizePart(refEl && refEl.value ? refEl.value : 'RA-');
+      if(!ref) ref = 'RA-';
+      const job = sanitizePart(jobEl && jobEl.value ? jobEl.value : '');
+
+      const iso = (dateEl && dateEl.value) ? dateEl.value : todayISO();
+      const dmy = isoToUKHyphen(iso); // dd-mm-yyyy
+
+      const parts = [ref, job, dmy].filter(Boolean);
+      return parts.join('_') + '.pdf';
+    }
+
+    // --- Visitors table row helpers ---
+    function removeRow(btn){ const tr = btn.closest('tr'); const tb = tr && tr.parentElement; if(tr && tb) tb.removeChild(tr); }
+    function addVisitor(){
+      const tb = document.querySelector('#visTable tbody');
+      if(!tb) return;
+      const i = tb.children.length + 1;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td><input type="text" name="vis_name_${i}"></td><td><input type=\"date\" name=\"vis_date_${i}\"></td><td class=\"center\"><button type=\"button\" class=\"btn\" onclick=\"removeRow(this)\">Remove</button></td>`;
+      tb.appendChild(tr);
+    }
+
+    // --- RRR calculation (L x S) ---
+    function calcRRR(el){
+      const tr = el.closest('tr');
+      const nums = tr ? tr.querySelectorAll('input[type=number]') : [];
+      if(nums.length < 2) return;
+      const L = Number(nums[0].value||0);
+      const S = Number(nums[1].value||0);
+      const r = tr.querySelector('input[name^="RRR_"]');
+      const val = (L>0 && S>0) ? L*S : '';
+      if(r) r.value = val;
+      if(tr) tr.style.background = val>=7 ? '#ffecec' : val>=4 ? '#fff8e1' : '';
+    }
+
+    // --- Ensure Date Finish auto-fills if blank when Date Start changes ---
+    document.addEventListener('change', (e)=>{
+      if(e.target && e.target.name==='date_start'){
+        const finish = document.querySelector('input[name="date_finish"]');
+        if(finish && !finish.value) finish.value = e.target.value;
+      }
+    });
+
+    // --- Prepare a clone for PDF with UK-formatted fields ---
+    function buildPrintableClone(){
+      const src = document.getElementById('page');
+      const clone = src.cloneNode(true);
+      // Force light appearance
+      clone.classList.add('printing');
+
+      // Hide placeholders for empty inputs so words like "Specify" don't print
+      clone.querySelectorAll('input, textarea').forEach(el=>{
+        if(!el.value && el.placeholder){ el.setAttribute('data-ph', el.placeholder); el.placeholder=''; }
+      });
+
+      // Convert DATE inputs to static text in UK format while preserving size
+      const origDates  = src.querySelectorAll('input[type="date"]');
+      const cloneDates = clone.querySelectorAll('input[type="date"]');
+      origDates.forEach((of, idx)=>{
+        const cf = cloneDates[idx];
+        if(!cf) return;
+        const cs = getComputedStyle(of);
+        const holder = document.createElement('div');
+        holder.className = 'print-field';
+        holder.style.display = 'block';
+        holder.style.width = cs.width;
+        holder.style.height = cs.height;
+        holder.style.border = '1px solid #666';
+        holder.style.background = '#fff';
+        holder.style.color = '#000';
+        holder.style.boxSizing = 'border-box';
+        holder.style.padding = cs.padding || '2mm';
+        holder.textContent = isoToUK(of.value);
+        cf.parentNode && cf.parentNode.replaceChild(holder, cf);
+      });
+
+      // Visitors table: remove Action column/buttons and expand Name/Date
+      const vt = clone.querySelector('#visTable');
+      if(vt){
+        vt.querySelectorAll('thead th:last-child, tbody td:last-child').forEach(n=>n.remove());
+        const ths = vt.querySelectorAll('thead th');
+        if(ths.length>=2){ ths[0].style.width='60%'; ths[1].style.width='40%'; }
+        vt.querySelectorAll('button').forEach(b=>b.remove());
+      }
+
+      // Remove any buttons inside the cloned page
+      clone.querySelectorAll('button').forEach(b=>b.remove());
+
+      return clone;
+    }
+
+    // --- PDF generation ---
+    async function generatePDF(){
+      // if Date Finish is blank, mirror Date Start
+      const start = document.querySelector('input[name="date_start"]');
+      const finish = document.querySelector('input[name="date_finish"]');
+      if(start && finish && !finish.value && start.value){ finish.value = start.value; }
+      // persist just before export
+      saveForm();
+      const el = buildPrintableClone();
+      const fileName = buildFileName();
+      const opt = { margin: [10,10,10,10], filename: fileName, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+      return await html2pdf().from(el).set(opt).outputPdf('blob');
+    }
+
+    // --- Buttons ---
+    document.getElementById('btnPDF')?.addEventListener('click', async () => {
+      try{
+        saveForm();
+        const blob = await generatePDF();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = buildFileName();
+        a.click();
+        setTimeout(()=>URL.revokeObjectURL(url), 5000);
+      }catch(e){ console.error(e); alert('Unable to generate PDF.'); }
+    });
+
+    document.getElementById('btnShare')?.addEventListener('click', async () => {
+      try{
+        saveForm();
+        const blob = await generatePDF();
+        const file = new File([blob], buildFileName(), {type:'application/pdf'});
+        if(navigator.canShare && navigator.canShare({ files: [file] })){
+          await navigator.share({ files: [file], title: BASE_NAME, text: 'Site Specific Risk Assessment & Site Register/Diary' });
+        } else {
+          alert('Sharing with attachment not supported. Use "Save as PDF" instead.');
+        }
+      }catch(err){ console.error(err); alert('Unable to generate or share PDF.'); }
+    });
+
+    // Clear button: reset to defaults and clear saved state
+    document.getElementById('btnClear')?.addEventListener('click', () => {
+      if(!confirm('Clear the form and reset Reference/Date?')) return;
+      clearForm();
+      saveForm();
+    });
+
+    // --- Persistence (localStorage) ---
+    const STORAGE_KEY = 'ra_form_persist_v2';
+    function saveForm(){
+      const form = document.getElementById('raForm');
+      const data = {};
+      const els = form.elements;
+      for(let i=0;i<els.length;i++){
+        const el = els[i];
+        if(!el.name) continue;
+        if(el.type === 'checkbox'){
+          const arr = data[el.name] || [];
+          if(el.checked) arr.push(el.value);
+          data[el.name] = arr;
+        } else if(el.type === 'radio'){
+          if(el.checked) data[el.name] = el.value;
+          else if(!(el.name in data)) data[el.name] = data[el.name] || '';
+        } else {
+          data[el.name] = el.value;
+        }
+      }
+      // visitors row count
+      const rows = document.querySelectorAll('#visTable tbody tr').length;
+      data['vis_rows'] = rows;
+      try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e){ /* ignore quota */ }
+    }
+    function restoreForm(){
+      let raw = null; try{ raw = localStorage.getItem(STORAGE_KEY);}catch(e){}
+      if(!raw) return;
+      const data = JSON.parse(raw);
+      // ensure visitors rows exist
+      const tb = document.querySelector('#visTable tbody');
+      const need = Math.max(1, Number(data['vis_rows']||1));
+      while(tb.children.length < need) addVisitor();
+      // set values
+      const form = document.getElementById('raForm');
+      const els = form.elements;
+      for(let i=0;i<els.length;i++){
+        const el = els[i];
+        if(!el.name) continue;
+        const val = data[el.name];
+        if(typeof val === 'undefined') continue;
+        if(el.type === 'checkbox'){
+          const arr = Array.isArray(val) ? val : [];
+          el.checked = arr.includes(el.value);
+        } else if(el.type === 'radio'){
+          el.checked = (val === el.value);
+        } else {
+          el.value = val;
+        }
+      }
+    }
+    function clearForm(){
+      const form = document.getElementById('raForm');
+      // reset all inputs/textarea
+      form.querySelectorAll('input, textarea').forEach(el=>{
+        if(el.name==='reference'){ el.value = 'RA-'; return; }
+        if(el.name==='doc_date'){ el.value = todayISO(); return; }
+        if(el.type==='checkbox' || el.type==='radio'){ el.checked = false; }
+        else { el.value = ''; }
+      });
+      // reset visitors to 1 blank row
+      const tb = document.querySelector('#visTable tbody');
+      tb.innerHTML = '';
+      addVisitor();
+      try{ localStorage.removeItem(STORAGE_KEY);}catch(e){}
+    }
+    // autosave
+    document.getElementById('raForm').addEventListener('input', saveForm);
+    document.getElementById('raForm').addEventListener('change', saveForm);
+    // restore on load
+    restoreForm();
+    // Ensure doc date has a value after restore
+    (function(){ const el = document.querySelector('input[name="doc_date"]'); if(el && !el.value) el.value = todayISO(); })();
+
+    // --- Minimal tests (opt-in) ---
+    (function(){
+      if(!location.search.includes('test=1')) return;
+      try {
+        // date formatting helper
+        console.assert(isoToUK('2025-10-04')==='04/10/2025','isoToUK should return dd/mm/yyyy');
+        console.assert(/^\d{2}-\d{2}-\d{4}$/.test(dateStampDMY()), 'dateStampDMY should be dd-mm-yyyy');
+        // autofill Date Finish when blank
+        const ds = document.querySelector('input[name="date_start"]');
+        const df = document.querySelector('input[name="date_finish"]');
+        ds.value = '2025-12-01'; df.value='';
+        ds.dispatchEvent(new Event('change', {bubbles:true}));
+        console.assert(df.value==='2025-12-01', 'Date Finish should mirror Date Start when blank');
+        // printable clone swaps text/number/date/textarea to static blocks
+        const clone = buildPrintableClone();
+        const remaining = clone.querySelectorAll('input[type="text"], input[type="number"], input[type="date"], textarea').length;
+        const allHidePh = Array.from(clone.querySelectorAll('input, textarea')).every(el=>!el.placeholder);
+        console.assert(allHidePh, 'Printable clone should hide placeholders in empty fields');
+        const vtHeadCells = clone.querySelectorAll('#visTable thead th').length;
+        console.assert(vtHeadCells===2, 'Visitors table in print should have only Name and Date columns');
+        console.assert(isoToUKHyphen('2025-10-05')==='05-10-2025','isoToUKHyphen should return dd-mm-yyyy');
+        // filename build
+        document.querySelector('input[name="reference"]').value='RA-001';
+        document.querySelector('input[name="job_number"]').value='123456-234/1';
+        document.querySelector('input[name="doc_date"]').value='2025-10-05';
+        console.assert(buildFileName()==='RA-001_123456-234-1_05-10-2025.pdf','Filename should use Reference + Job + Date dd-mm-yyyy with sanitization');
+        console.log('Inline tests passed');
+      } catch (e) {
+        console.error('Inline tests failed', e);
+      }
+    })();
+  </script>
+</body>
+</html>
