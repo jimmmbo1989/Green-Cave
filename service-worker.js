@@ -1,5 +1,5 @@
 // Service worker for offline caching
-const CACHE_NAME = 'gcl-pwa-v2';
+const CACHE_NAME = 'Green-Cave';
 const ASSETS = [
   './',
   './index.html',
