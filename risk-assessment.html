@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GCL-RA001 – Site Specific Risk Assessment & Site Register/Diary</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- html2pdf bundle (html2canvas + jsPDF) -->
+  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+  <style>
+    :root{--ink:#111;--muted:#555;--line:#000;--accent:#1a73e8;--bg:#fff}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,sans-serif}
+    .page{width:210mm;min-height:297mm;margin:0 auto;padding:10mm;background:#fff;box-shadow:0 0 0.5mm rgba(0,0,0,.1)}
+    .a4{width:210mm}
+    h1,h2,h3{margin:0}
+    .title{display:flex;gap:8mm;align-items:center;border:1px solid var(--line);padding:6mm}
+    .logo{flex:0 0 35mm;height:25mm;border:1px dashed #999;display:flex;align-items:center;justify-content:center;font-weight:700;letter-spacing:.5px}
+    .doc-head{display:grid;grid-template-columns: 1fr auto;gap:2mm;align-items:center}
+    .grid{display:grid;gap:2mm}
+    .meta{grid-template-columns: repeat(8, 1fr)}
+    .meta .cell{border:1px solid var(--line);padding:2mm;font-size:11px;min-height:14mm}
+    .cell label{display:block;font-size:10px;color:var(--muted);margin-bottom:1mm}
+    input[type=text], input[type=date], input[type=number], textarea{width:100%;border:1px solid #666;padding:2mm;font:inherit;font-size:11px}
+    textarea{min-height:22mm;resize:vertical}
+    .section{border:1px solid var(--line);padding:3mm;margin-top:3mm}
+    .section > .heading{font-weight:700;margin-bottom:2mm}
+    .row{display:grid;grid-template-columns: repeat(12, 1fr);gap:2mm}
+    .box{border:1px solid var(--line);padding:2mm;font-size:11px;min-height:14mm}
+    .box label{display:block;font-size:10px;color:var(--muted);margin-bottom:1mm}
+    .checkline{display:flex;flex-wrap:wrap;gap:6mm}
+    .checkline label{display:inline-flex;align-items:center;gap:3mm;font-size:11px}
+    .small{font-size:10px;color:#333}
+    .table{width:100%;border-collapse:collapse;font-size:11px}
+    .table th,.table td{border:1px solid var(--line);padding:2mm;vertical-align:top}
+    .table th{background:#f6f6f6;text-align:left}
+    .center{text-align:center}
+    .right{text-align:right}
+    .muted{color:var(--muted)}
+    .actions{display:flex;gap:6px;justify-content:flex-end;margin:8mm 0}
+    .btn{border:1px solid #333;background:#fafafa;padding:8px 12px;font-weight:600;cursor:pointer}
+    .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .subtle{font-size:10px;color:var(--muted)}
+    .inline-input{display:inline-flex;gap:3mm;align-items:center}
+    .w-2{grid-column: span 2}
+    .w-3{grid-column: span 3}
+    .w-4{grid-column: span 4}
+    .w-6{grid-column: span 6}
+    .w-8{grid-column: span 8}
+    .w-12{grid-column: span 12}
+    .no-border{border:none}
+    /* print */
+    @media print{
+      body{background:#fff}
+      .page{margin:0;box-shadow:none;padding:6mm}
+      .actions{display:none}
+      a[href]::after{content:""}
+    }
+  </style>
+</head>
+<body>
+  <div class="actions">
+    <button class="btn" id="btnPrint">Print</button>
+    <button class="btn" id="btnPDF">Save as PDF</button>
+    <button class="btn primary" id="btnShare">Share as PDF</button>
+  </div>
+
+  <form id="raForm">
+  <div id="page" class="page">
+    <!-- Header / Logo / Title -->
+    <div class="title">
+      <div class="logo" aria-label="Logo placeholder">LOGO</div>
+      <div style="flex:1">
+        <h1 style="font-size:16px">Site Specific Risk Assessment &amp; Site Register/Diary</h1>
+        <div class="small">Must be Completed Before Starting Work &amp; Amended if Site Conditions Change</div>
+      </div>
+    </div>
+
+    <!-- Document meta -->
+    <div class="grid meta" style="margin-top:3mm">
+      <div class="cell w-3"><label>Reference</label><input type="text" name="reference" value="F-JHG-RA001" /></div>
+      <div class="cell w-2"><label>Revision</label><input type="text" name="revision" value="6" /></div>
+      <div class="cell w-2"><label>Date</label><input type="date" name="doc_date" /></div>
+      <div class="cell w-2"><label>Sheet No</label><input type="text" name="sheetno" value="1" /></div>
+      <div class="cell w-1"><label>of</label><input type="text" name="of" value="1" /></div>
+    </div>
+
+    <div class="section">
+      <div class="row">
+        <div class="box w-4"><label>Name</label><input type="text" name="name" autocomplete="name"/></div>
+        <div class="box w-4"><label>Signed</label><input type="text" name="signed"/></div>
+        <div class="box w-4"><label>Job Number</label><input type="text" name="job_number"/></div>
+      </div>
+      <div class="row" style="margin-top:2mm">
+        <div class="box w-8"><label>Address</label><textarea name="address"></textarea></div>
+        <div class="box w-4"><label>Date/s</label><input type="text" name="dates" placeholder="e.g. 03–05 Oct 2025"/></div>
+      </div>
+      <div class="row" style="margin-top:2mm">
+        <div class="box w-12"><label>Description of Works</label><textarea name="description"></textarea></div>
+      </div>
+    </div>
+
+    <!-- HAVs -->
+    <div class="section">
+      <div class="heading">Highest Individual HAVs Points – Record per individual and if over 300 write name in box, contact supervisor</div>
+      <table class="table" id="havTable" style="margin-top:2mm">
+        <thead>
+          <tr><th style="width:50%">Name</th><th style="width:25%">Points</th><th class="center" style="width:25%">Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><input type="text" name="hav_name_1"></td><td><input type="number" name="hav_points_1" min="0"></td><td class="center"><button type="button" class="btn" onclick="removeRow(this)">Remove</button></td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:3mm"><button type="button" class="btn" onclick="addHAV()">Add Person</button></div>
+    </div>
+
+    <!-- Activity / Location / Cable -->
+    <div class="section">
+      <div class="row">
+        <div class="box w-6">
+          <label>Activity</label>
+          <div class="checkline">
+            <label><input type="checkbox" name="activity" value="Excavation"> Excavation</label>
+            <label><input type="checkbox" name="activity" value="Reinstatement"> Reinstatement</label>
+            <label><input type="checkbox" name="activity" value="Cabling"> Cabling</label>
+            <label><input type="checkbox" name="activity" value="Jointing"> Jointing</label>
+          </div>
+        </div>
+        <div class="box w-6">
+          <label>Location</label>
+          <div class="checkline">
+            <label><input type="checkbox" name="location" value="Cust Conn"> Cust Conn</label>
+            <label><input type="checkbox" name="location" value="Int"> Int</label>
+            <label><input type="checkbox" name="location" value="Ext"> Ext</label>
+            <label><input type="checkbox" name="location" value="O/H"> O/H</label>
+            <label><input type="checkbox" name="location" value="U/G"> U/G</label>
+          </div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:2mm">
+        <div class="box w-12">
+          <label>Cable</label>
+          <div class="checkline">
+            <label><input type="checkbox" name="cable" value="Sub Duct"> Sub Duct</label>
+            <label><input type="checkbox" name="cable" value="Blown Fibre"> Blown Fibre</label>
+            <label><input type="checkbox" name="cable" value="Rod & Rope"> Rod &amp; Rope</label>
+            <label><input type="checkbox" name="cable" value="Copper"> Copper</label>
+            <label><input type="checkbox" name="cable" value="Fibre"> Fibre</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Persons at risk / briefed / CAT&Genny / Gas Test / Weather -->
+    <div class="section">
+      <div class="row">
+        <div class="box w-6">
+          <label>Persons at Risk?</label>
+          <div class="checkline">
+            <label><input type="checkbox" name="risk_persons" value="Competent Staff"> Competent Staff</label>
+            <label><input type="checkbox" name="risk_persons" value="Client Staff"> Client Staff</label>
+            <label><input type="checkbox" name="risk_persons" value="M.O.P."> M.O.P.</label>
+          </div>
+        </div>
+        <div class="box w-6">
+          <label>CAT &amp; Genny Used?</label>
+          <div class="checkline">
+            <label><input type="radio" name="cat_genny" value="Y"> Y</label>
+            <label><input type="radio" name="cat_genny" value="N"> N</label>
+          </div>
+          <label style="margin-top:3mm">Gas Test Result</label>
+          <div class="checkline">
+            <label><input type="radio" name="gas_test" value="P"> P</label>
+            <label><input type="radio" name="gas_test" value="N"> N</label>
+          </div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:2mm">
+        <div class="box w-12">
+          <label>Weather</label>
+          <div class="checkline">
+            <label><input type="checkbox" name="weather" value="Sunny"> Sunny</label>
+            <label><input type="checkbox" name="weather" value="Rain"> Rain</label>
+            <label><input type="checkbox" name="weather" value="Frost"> Frost</label>
+            <label><input type="checkbox" name="weather" value="Snow"> Snow</label>
+            <label><input type="checkbox" name="weather" value="Windy"> Windy</label>
+            <span class="inline-input"><label><input type="checkbox" name="weather" value="Other"> Other</label><input type="text" name="weather_other" placeholder="Specify"></span>
+          </div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:2mm">
+        <div class="box w-12">
+          <label>Risk Elements (tick as applicable)</label>
+          <div class="checkline">
+            <label><input type="checkbox" name="risk_element" value="Environment"> Environment</label>
+            <label><input type="checkbox" name="risk_element" value="Electrical Equipment"> Electrical Equipment</label>
+            <label><input type="checkbox" name="risk_element" value="Vehicles"> Vehicles</label>
+            <label><input type="checkbox" name="risk_element" value="Manual Handling"> Manual Handling</label>
+            <label><input type="checkbox" name="risk_element" value="Working at Height"> Working at Height</label>
+            <label><input type="checkbox" name="risk_element" value="Excavation"> Excavation</label>
+            <label><input type="checkbox" name="risk_element" value="Mechanical Lifting"> Mechanical Lifting</label>
+            <label><input type="checkbox" name="risk_element" value="Working with Optic Fibre"> Working with Optic Fibre</label>
+            <label><input type="checkbox" name="risk_element" value="Hot Works"> Hot Works</label>
+            <label><input type="checkbox" name="risk_element" value="Hand Tools"> Hand Tools</label>
+            <label><input type="checkbox" name="risk_element" value="Confined Space Working"> Confined Space Working</label>
+            <label><input type="checkbox" name="risk_element" value="COSHH"> COSHH</label>
+          </div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:2mm">
+        <div class="box w-12"><label>Comments &amp; Instruction</label><textarea name="comments"></textarea></div>
+      </div>
+    </div>
+
+    <!-- Risk Matrix legend (static) -->
+    <div class="section">
+      <div class="heading">Risk Matrix Guidance</div>
+      <div class="row" style="margin-top:2mm">
+        <div class="box w-6">
+          <strong>Likelihood of Harm (L)</strong>
+          <div class="small" style="margin-top:1mm">3 – Very likely to occur<br>2 – May occur<br>1 – Unlikely to occur</div>
+        </div>
+        <div class="box w-6">
+          <strong>Severity of Harm (S)</strong>
+          <div class="small" style="margin-top:1mm">3 – High (Fatal, loss of limb, sight etc.)<br>2 – Med (Broken bones, deep cuts etc.)<br>1 – Low (Small cuts, grazes etc.)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Task Risk Assessment rows -->
+    <div class="section">
+      <div class="heading">Task Risk Controls &amp; Residual Risk Ratings</div>
+      <table class="table" id="riskTable" style="margin-top:2mm">
+        <thead>
+          <tr>
+            <th>Risk Element</th>
+            <th>Task Risk Assessment Nos.</th>
+            <th>Site Specific Action Taken / Controls Required (additional to task assessment)</th>
+            <th class="center" style="width:16mm">L</th>
+            <th class="center" style="width:16mm">S</th>
+            <th class="center" style="width:18mm">RRR</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Location</td>
+            <td><input type="text" name="tra_location"></td>
+            <td><textarea name="ctrl_location"></textarea></td>
+            <td class="center"><input type="number" name="L_location" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="S_location" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="RRR_location" readonly></td>
+          </tr>
+          <tr>
+            <td>Handling / lifting</td>
+            <td><input type="text" name="tra_handling"></td>
+            <td><textarea name="ctrl_handling"></textarea></td>
+            <td class="center"><input type="number" name="L_handling" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="S_handling" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="RRR_handling" readonly></td>
+          </tr>
+          <tr>
+            <td>Tools</td>
+            <td><input type="text" name="tra_tools"></td>
+            <td><textarea name="ctrl_tools"></textarea></td>
+            <td class="center"><input type="number" name="L_tools" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="S_tools" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="RRR_tools" readonly></td>
+          </tr>
+          <tr>
+            <td>Working at Height</td>
+            <td><input type="text" name="tra_height"></td>
+            <td><textarea name="ctrl_height"></textarea></td>
+            <td class="center"><input type="number" name="L_height" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="S_height" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="RRR_height" readonly></td>
+          </tr>
+          <tr>
+            <td>Working U/G</td>
+            <td><input type="text" name="tra_ug"></td>
+            <td><textarea name="ctrl_ug"></textarea></td>
+            <td class="center"><input type="number" name="L_ug" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="S_ug" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="RRR_ug" readonly></td>
+          </tr>
+          <tr>
+            <td>Electrical Equipment</td>
+            <td><input type="text" name="tra_elec"></td>
+            <td><textarea name="ctrl_elec"></textarea></td>
+            <td class="center"><input type="number" name="L_elec" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="S_elec" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="RRR_elec" readonly></td>
+          </tr>
+          <tr>
+            <td>Work Equipment</td>
+            <td><input type="text" name="tra_we"></td>
+            <td><textarea name="ctrl_we"></textarea></td>
+            <td class="center"><input type="number" name="L_we" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="S_we" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="RRR_we" readonly></td>
+          </tr>
+          <tr>
+            <td>Environmental</td>
+            <td><input type="text" name="tra_env"></td>
+            <td><textarea name="ctrl_env"></textarea></td>
+            <td class="center"><input type="number" name="L_env" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="S_env" min="1" max="3" oninput="calcRRR(this)"></td>
+            <td class="center"><input type="number" name="RRR_env" readonly></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Environmental aspects -->
+    <div class="section">
+      <div class="heading">Environmental Aspects for works</div>
+      <div class="row" style="margin-top:2mm">
+        <div class="box w-4"><label>Excavation</label><textarea name="env_exc"></textarea></div>
+        <div class="box w-4"><label>Cabling</label><textarea name="env_cab"></textarea></div>
+        <div class="box w-4"><label>Jointing</label><textarea name="env_join"></textarea></div>
+      </div>
+    </div>
+
+    <!-- COSHH / Subbie RAs -->
+    <div class="section">
+      <div class="heading">COSHH / Other / Sub Contractor Risk Assessments</div>
+      <textarea name="coshh" style="width:100%;min-height:24mm"></textarea>
+      <div class="checkline" style="margin-top:2mm">
+        <span>All tools and equipment checked prior to use and fit for use?</span>
+        <label><input type="radio" name="tools_checked" value="Y"> Y</label>
+        <label><input type="radio" name="tools_checked" value="N"> N</label>
+      </div>
+    </div>
+
+    <!-- PPE -->
+    <div class="section">
+      <div class="heading">Personal Protective Equipment (PPE)</div>
+      <div class="checkline" style="margin-top:2mm">
+        <label><input type="checkbox" name="ppe" value="Overalls"> Overalls</label>
+        <label><input type="checkbox" name="ppe" value="High Visibility Vest"> High Visibility Vest</label>
+        <label><input type="checkbox" name="ppe" value="Eye Protection"> Eye Protection</label>
+        <label><input type="checkbox" name="ppe" value="Hard Hat"> Hard Hat</label>
+        <label><input type="checkbox" name="ppe" value="Dust Mask"> Dust Mask</label>
+        <label><input type="checkbox" name="ppe" value="Safety Boots"> Safety Boots</label>
+        <label><input type="checkbox" name="ppe" value="Jacket"> Jacket</label>
+        <label><input type="checkbox" name="ppe" value="Ear Protection"> Ear Protection</label>
+        <label><input type="checkbox" name="ppe" value="Gloves"> Gloves</label>
+        <label><input type="checkbox" name="ppe" value="Respirator"> Respirator</label>
+        <span class="inline-input"><span>Other</span><input type="text" name="ppe_other" style="min-width:40mm"></span>
+      </div>
+    </div>
+
+    <!-- Briefed to / site visitors -->
+    <div class="section">
+      <div class="heading">Briefed to / site visitors: Name / Signature</div>
+      <table class="table" id="visTable" style="margin-top:2mm">
+        <thead><tr><th style="width:55%">Name</th><th style="width:35%">Signature</th><th class="center" style="width:10%">Action</th></tr></thead>
+        <tbody>
+          <tr><td><input type="text" name="vis_name_1"></td><td><input type="text" name="vis_sig_1"></td><td class="center"><button type="button" class="btn" onclick="removeRow(this)">Remove</button></td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:3mm"><button type="button" class="btn" onclick="addVisitor()">Add Row</button></div>
+    </div>
+
+    <!-- Residual Risk Ratings guidance -->
+    <div class="section">
+      <div class="heading">Residual Risk Ratings (RRR)</div>
+      <div class="small" style="margin-top:1mm">
+        <strong>High:</strong> STOP WORK – Contact manager / supervisor<br>
+        <strong>Med:</strong> Apply additional controls to reduce to low. If still Med. contact manager / supervisor for advice<br>
+        <strong>Low:</strong> Carry out work as per knowledge, skills, training and experience
+      </div>
+    </div>
+
+    <div class="small" style="margin-top:4mm">
+      Once completed brief to all on site and attach the completed form to job work sheet. <em>Note: Person completing this form is the authorised person in charge of the site.</em>
+    </div>
+  </div>
+  </form>
+
+  <script>
+    // dynamic rows
+    function removeRow(btn){ const tr = btn.closest('tr'); const tb = tr.parentElement; tb.removeChild(tr); }
+    function addVisitor(){
+      const tb = document.querySelector('#visTable tbody');
+      const i = tb.children.length + 1;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td><input type="text" name="vis_name_${i}"></td><td><input type="text" name="vis_sig_${i}"></td><td class="center"><button type="button" class="btn" onclick="removeRow(this)">Remove</button></td>`;
+      tb.appendChild(tr);
+    }
+    function addHAV(){
+      const tb = document.querySelector('#havTable tbody');
+      const i = tb.children.length + 1;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td><input type="text" name="hav_name_${i}"></td><td><input type="number" name="hav_points_${i}" min="0"></td><td class="center"><button type="button" class="btn" onclick="removeRow(this)">Remove</button></td>`;
+      tb.appendChild(tr);
+    }
+
+    // RRR calculation (L x S)
+    function calcRRR(el){
+      const tr = el.closest('tr');
+      const inputs = tr.querySelectorAll('input[type=number]');
+      const L = Number(inputs[0].value||0);
+      const S = Number(inputs[1].value||0);
+      const RRR = tr.querySelector('input[name^="RRR_"]');
+      const val = (L>0 && S>0) ? L*S : '';
+      RRR.value = val;
+      tr.style.background = val>=7 ? '#ffecec' : val>=4 ? '#fff8e1' : '';
+    }
+
+    // Print
+    document.getElementById('btnPrint').addEventListener('click', () => window.print());
+
+    // Save PDF via html2pdf
+    async function generatePDF(){
+      const el = document.getElementById('page');
+      const opt = { margin: 5, filename: `GCL-RA001_${new Date().toISOString().slice(0,10)}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+      return await html2pdf().from(el).set(opt).outputPdf('blob');
+    }
+
+    document.getElementById('btnPDF').addEventListener('click', async () => {
+      const blob = await generatePDF();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `GCL-RA001_${new Date().toISOString().slice(0,10)}.pdf`;
+      a.click();
+      setTimeout(()=>URL.revokeObjectURL(url), 5000);
+    });
+
+    // Share PDF using Web Share API (if supported)
+    document.getElementById('btnShare').addEventListener('click', async () => {
+      try{
+        const blob = await generatePDF();
+        const file = new File([blob], `GCL-RA001_${new Date().toISOString().slice(0,10)}.pdf`, {type:'application/pdf'});
+        if(navigator.canShare && navigator.canShare({ files: [file] })){
+          await navigator.share({ files: [file], title: 'GCL-RA001', text: 'Site Specific Risk Assessment & Site Register/Diary' });
+        } else {
+          alert('Share with attachment not supported on this device/browser. Use "Save as PDF" instead and share manually.');
+        }
+      }catch(err){ console.error(err); alert('Unable to generate or share PDF.'); }
+    });
+  </script>
+</body>
+</html>
